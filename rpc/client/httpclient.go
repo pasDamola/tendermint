@@ -43,6 +43,13 @@ type HTTP struct {
 	*baseRPCClient
 	*WSEvents
 }
+// HTTPS struct
+type HTTPS struct {
+	remote string
+	rpc *rpcclient.JSONRPCClient
+
+	*baseRPCClient
+}
 
 // BatchHTTP provides the same interface as `HTTP`, but allows for batching of
 // requests (as per https://www.jsonrpc.org/specification#batch). Do not
@@ -79,6 +86,7 @@ type baseRPCClient struct {
 var _ rpcClient = (*HTTP)(nil)
 var _ rpcClient = (*BatchHTTP)(nil)
 var _ rpcClient = (*baseRPCClient)(nil)
+var _ rpcClient = (*HTTPS)(nil)
 
 //-----------------------------------------------------------------------------
 // HTTP
@@ -87,6 +95,12 @@ var _ rpcClient = (*baseRPCClient)(nil)
 // the websocket path (which always seems to be "/websocket")
 // The function panics if the provided remote is invalid.<Paste>
 func NewHTTP(remote, wsEndpoint string) *HTTP {
+	httpClient := rpcclient.DefaultHTTPClient(remote)
+	return NewHTTPWithClient(remote, wsEndpoint, httpClient)
+}
+
+//NewHTTPS function
+func NewHTTPS(remote, wsEndpoint string) *HTTPS {
 	httpClient := rpcclient.DefaultHTTPClient(remote)
 	return NewHTTPWithClient(remote, wsEndpoint, httpClient)
 }
